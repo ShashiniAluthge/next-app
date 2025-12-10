@@ -1,6 +1,5 @@
-import 'dotenv/config'
-import { PrismaMariaDb } from '@prisma/adapter-mariadb'
-import { PrismaClient } from '@/app/generated/prisma/client'
+import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
 const adapter = new PrismaMariaDb({
     host: "localhost",
@@ -8,9 +7,16 @@ const adapter = new PrismaMariaDb({
     user: "root",
     password: "root123",
     database: "nextapp",
+});
 
-})
+const globalForPrisma = globalThis as unknown as {
+    prisma: PrismaClient | undefined;
+};
 
-const prisma = new PrismaClient({ adapter })
+const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
-export default prisma
+if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = prisma;
+}
+
+export default prisma;
