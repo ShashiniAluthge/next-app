@@ -3,18 +3,15 @@ import schema from "../schema";
 import prisma from "@/prisma/client";
 
 
-interface Props {
-    id: string;
-}
 export async function GET(
     request: NextRequest,
-    { params }: { params: Props }
+    { params }: { params: Promise<{ id: string; }> }
 ) {
     const { id } = await params;
 
     const userId = parseInt(id);
     const user = await prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: id }
     });
 
     if (!user)
@@ -25,10 +22,10 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: Props }
+    { params }: { params: Promise<{ id: string; }> }
 ) {
     const { id } = await params;
-    const userId = parseInt(id);
+    // const userId = parseInt(id);
     const body = await request.json();
 
     const validation = schema.safeParse(body);
@@ -38,7 +35,7 @@ export async function PUT(
     }
 
     const user = await prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: id }
     })
 
     if (!user)
@@ -46,7 +43,7 @@ export async function PUT(
 
 
     const updatedUser = await prisma.user.update({
-        where: { id: userId },
+        where: { id: id },
         data: {
             name: body.name,
             email: body.email
@@ -58,21 +55,21 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: Props }
+    { params }: { params: Promise<{ id: string; }> }
 ) {
     const { id } = await params;
 
-    const userId = parseInt(id);
+    //const userId = parseInt(id);
 
     const user = await prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: id }
     })
 
     if (!user)
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
     await prisma.user.delete({
-        where: { id: userId }
+        where: { id: id }
     })
     return NextResponse.json({ message: 'User deleted successfully.' }, { status: 200 });
 }
